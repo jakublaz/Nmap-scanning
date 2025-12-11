@@ -1,0 +1,2 @@
+przeniesienie hasła do maila do env variables in mikrotik
+change set viariables for email into variables
