@@ -27,10 +27,13 @@ if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
     echo "CRITICAL ERROR: Image missing. No Makefile to build it, and no .tar file to load it."
     exit 1
   fi
+else
+  # NEW: This tells you that it found the image
+  echo "Image '$IMAGE_NAME' found locally. Skipping build."
 fi
 
 echo "Starting container: $CONTAINER_NAME in mode: $MODE..."
 
-docker run --rm -it --env-file .env "$IMAGE_NAME" "$MODE"
+docker run --rm -it --net=host --env-file .env "$IMAGE_NAME" "$MODE"
 
 echo "Execution finished."

@@ -28,7 +28,6 @@ Them reboot the container.
 
 ```bash
 git clone https://github.com/jakublaz/Nmap-scanning.git
-cd Nmap-scanning/scripts
 ````
 
 #### Now lets create a setting file for email by running this commands :
@@ -48,8 +47,10 @@ logfile /var/log/msmtp.log
 EOF
 ```
 
-### Finally build the container :
+### Finally give permissions to the script :
 ```bash
-make build
+cd scripts
+chmod +x run.sh
+./run.sh
 ```
 
