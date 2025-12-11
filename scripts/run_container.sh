@@ -8,13 +8,23 @@ MODE="auto"
 
 # --- Execution ---
 
-# Check if image exists, otherwise load from tar
+# Check if image exists
 if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
-  if [ -f "$IMAGE_NAME.tar" ]; then
+  echo "Image '$IMAGE_NAME' not found locally."
+
+  # OPTION 1: Build from source (Best for your current setup)
+  if [ -f "Makefile" ]; then
+    echo "Makefile found. Building image..."
+    make build
+
+  # OPTION 2: Load from Tar (Backup for offline/production)
+  elif [ -f "$IMAGE_NAME.tar" ]; then
     echo "Loading image from tar file..."
     docker load -i "$IMAGE_NAME.tar"
+
+  # ERROR: Nothing works
   else
-    echo "Image not found and .tar file is missing."
+    echo "CRITICAL ERROR: Image missing. No Makefile to build it, and no .tar file to load it."
     exit 1
   fi
 fi
