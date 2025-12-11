@@ -9,7 +9,7 @@ Makes container sleep for 1 hour after execution to allow debugging.
 We need to select from :
 - auto
 - ping 
-- custom (if this give IP adress after it)
+- custom (if this give IP address after it)
 ### Scanning options:
 #### Presets:
 - fast
@@ -30,3 +30,7 @@ it works now for :
 - ping on wrong network
 - custom 192.168.0.1 -p 80,443 --script http-title
 - router-arp alone for now tested
+
+
+
+WRITE ABOUT FILES IN GIT IGNORE
