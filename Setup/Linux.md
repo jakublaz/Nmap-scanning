@@ -13,7 +13,7 @@ reboot
 
 ## Clone this repository
 ### If you are running this as LXC on Proxmox :
-- Make sure to enable nesting and keyctl in the privileged container options.
+- Make sure to enable nesting and keyctl in the unprivileged container options.
 #### Then run on proxmox:
 ````bash
 nano /etc/pve/lxc/container_number.conf

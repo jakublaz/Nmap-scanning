@@ -27,7 +27,27 @@ else
 fi
 
 # Enter the repository
-cd Nmap-scanning
+cd Nmap-scanning/scripts
+
+# .env Configuration ---
+echo "--- Environment Configuration (.env) ---"
+echo "Please configure the scanning variables."
+read -p "Enter Router IP (e.g., 192.168.0.1): " ROUTER_IP
+read -p "Enter Router User: " ROUTER_USER
+read -sp "Enter Router Password: " ROUTER_PASS
+echo "" # Newline for formatting
+read -p "Enter Subnet to Scan (e.g., 192.168.0.0/24): " AUTO_SUBNET
+
+# Create the .env file
+cat <<EOF > .env
+ROUTER_IP=$ROUTER_IP
+ROUTER_USER=$ROUTER_USER
+ROUTER_PASS=$ROUTER_PASS
+AUTO=$AUTO_SUBNET
+EOF
+echo ".env file created successfully."
+
+cd ..
 
 echo "--- MSMPT Configuration ---"
 echo "Please enter the credentials for the msmtprc file."
