@@ -4,7 +4,30 @@ set -e
 # --- Configuration ---
 IMAGE_NAME="nmap-python"
 CONTAINER_NAME="nmap-scanner"
-MODE="auto"
+
+# --- Mode Selection Logic ---
+# 1. Use command line
+if [ ! -z "$1" ]; then
+    MODE="$@"
+
+# 2. If no arguments, ASK the user.
+else
+    echo "------------------------------------------------"
+    echo "Select Scanning Mode:"
+    echo "  1) auto        (Full subnet scan using .env)"
+    echo "  2) ping        (Ping sweep only - finds live hosts)"
+    echo "  3) router-arp  (Scan only devices found in Router ARP)"
+    echo "  4) custom      (Manual input)"
+    echo "------------------------------------------------"
+    read -p "Enter mode [default: auto]: " USER_INPUT
+
+    # Default to 'auto' if user hits Enter
+    if [ -z "$USER_INPUT" ]; then
+        MODE="auto"
+    else
+        MODE="$USER_INPUT"
+    fi
+fi
 
 # --- Execution ---
 cd ..
@@ -24,7 +47,7 @@ if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
 
   # ERROR: Nothing works
   else
-    
+
     echo "CRITICAL ERROR: Image missing. No Makefile to build it, and no .tar file to load it."
     exit 1
   fi
@@ -35,6 +58,6 @@ fi
 
 echo "Starting container: $CONTAINER_NAME in mode: $MODE..."
 
-docker run --rm -it --net=host --env-file .env "$IMAGE_NAME" "$MODE"
+docker run --rm -it --net=host --env-file .env "$IMAGE_NAME" $MODE
 
 echo "Execution finished."

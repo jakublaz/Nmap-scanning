@@ -26,8 +26,7 @@ else
     git clone https://github.com/jakublaz/Nmap-scanning.git
 fi
 
-# Enter the repository
-cd Nmap-scanning/scripts
+cd Nmap-scanning
 
 # .env Configuration ---
 echo "--- Environment Configuration (.env) ---"
@@ -47,8 +46,7 @@ AUTO=$AUTO_SUBNET
 EOF
 echo ".env file created successfully."
 
-cd ..
-
+# Email Configuration
 echo "--- MSMPT Configuration ---"
 echo "Please enter the credentials for the msmtprc file."
 read -p "Enter Gmail User (e.g., user@mail.com): " GMAIL_USER
@@ -70,20 +68,8 @@ tls_trust_file /etc/ssl/certs/ca-certificates.crt
 logfile /var/log/msmtp.log
 EOF
 
-echo "--- Executing Run Script ---"
-# Check if the scripts directory exists (Fixing the 'cd scriptschmod' typo)
-if [ -d "scripts" ]; then
-    cd scripts
-    chmod +x run.sh
-    
-    # Executing the script. 
-    # Note: Since this setup script is running as root (sudo), 
-    # ./run.sh will also run as root, avoiding docker permission issues.
-    ./run.sh
-else
-    echo "Error: 'scripts' directory not found inside Nmap-scanning."
-    exit 1
-fi
+# Add access to the whole folder
+chmod -R +x Nmap-scanning/
 
 echo "--- Setup Complete ---"
 read -p "A reboot is recommended to finalize permissions. Reboot now? (y/n) " yn
