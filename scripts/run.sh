@@ -24,6 +24,7 @@ if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
 
   # ERROR: Nothing works
   else
+    
     echo "CRITICAL ERROR: Image missing. No Makefile to build it, and no .tar file to load it."
     exit 1
   fi
