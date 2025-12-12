@@ -7,7 +7,7 @@ CONTAINER_NAME="nmap-scanner"
 MODE="auto"
 
 # --- Execution ---
-
+cd ..
 # Check if image exists
 if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
   echo "Image '$IMAGE_NAME' not found locally."
