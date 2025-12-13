@@ -26,7 +26,7 @@ else
     git clone https://github.com/jakublaz/Nmap-scanning.git
 fi
 
-cd Nmap-scanning
+cd Nmap-scanning/scripts
 
 # .env Configuration ---
 echo "--- Environment Configuration (.env) ---"
@@ -45,6 +45,8 @@ ROUTER_PASS=$ROUTER_PASS
 AUTO=$AUTO_SUBNET
 EOF
 echo ".env file created successfully."
+
+cd ..
 
 # Email Configuration
 echo "--- MSMPT Configuration ---"
@@ -73,7 +75,7 @@ cd ..
 chmod -R +x Nmap-scanning
 
 echo "--- Setup Complete ---"
-read -p "A reboot is recommended to finalize permissions. Reboot now? (y/n) " yn
+read -p "A reboot is required for the scanner to work properly. Reboot now? (y/n) " yn
 case $yn in 
     [Yy]* ) sudo reboot;;
     [Nn]* ) echo "Please reboot manually later to finalize Docker group changes.";;

@@ -9,6 +9,7 @@ CONTAINER_NAME="nmap-scanner"
 # 1. Use command line arguments if provided (e.g., ./run.sh auto --preset fast)
 if [ ! -z "$1" ]; then
     FINAL_ARGS="$@"
+    MODE="$1"
 
 # 2. If no arguments, start INTERACTIVE WIZARD
 else
@@ -55,6 +56,49 @@ else
         # Combine Mode and Preset for the final command
         # Result looks like: auto --preset fast
         FINAL_ARGS="$MODE --preset $PRESET"
+    fi
+fi
+
+# --- PRE-FLIGHT CHECKS ---
+if [ "$MODE" == "router-arp" ]; then
+    # 1. Load the Router IP from the .env file to check it
+    if [ -f .env ]; then
+        source .env
+    else
+        echo "Error: .env file missing. Cannot check router IP."
+        exit 1
+    fi
+
+    echo "------------------------------------------------"
+    echo "Pre-flight Check: Verifying Router Connection..."
+
+    # 2. Check if Router IP is set
+    if [ -z "$ROUTER_IP" ]; then
+        echo " [X] ERROR: ROUTER_IP is not set in .env"
+        echo "     Cannot use router-arp mode."
+        exit 1
+    fi
+
+    # 3. Check TCP Port 22 (SSH) using Bash built-ins (no extra tools needed)
+    # timeout 2s tries to connect to /dev/tcp/IP/22
+    if timeout 2 bash -c "</dev/tcp/$ROUTER_IP/22" &>/dev/null; then
+        echo " [✓] Connection Confirmed: SSH is open on $ROUTER_IP."
+    else
+        echo " [X] ERROR: Cannot connect to Router SSH ($ROUTER_IP:22)."
+        echo "     The device might be offline, or it is not a MikroTik router."
+        echo "------------------------------------------------"
+        echo "Would you like to switch to 'ping' sweep mode instead? (y/n)"
+        read -p "Selection: " FALLBACK_CHOICE
+        
+        if [[ "$FALLBACK_CHOICE" =~ ^[Yy]$ ]]; then
+            echo ">> Switching mode to 'ping'..."
+            MODE="ping"
+            # Ping mode doesn't need a preset usually, but we ensure args are clean
+            FINAL_ARGS="ping"
+        else
+            echo "Exiting."
+            exit 1
+        fi
     fi
 fi
 

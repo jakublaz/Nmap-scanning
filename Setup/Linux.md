@@ -21,6 +21,7 @@ Run the following commands in terminal :
 chmod +x setup.sh
 sudo ./setup.sh
 ```
+You are required to reboot the machine for it to work properly.
 
 #### Then to run the scanning just use this command:
 
