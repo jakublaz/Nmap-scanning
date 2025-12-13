@@ -69,7 +69,8 @@ logfile /var/log/msmtp.log
 EOF
 
 # Add access to the whole folder
-chmod -R +x Nmap-scanning/
+cd ..
+chmod -R +x Nmap-scanning
 
 echo "--- Setup Complete ---"
 read -p "A reboot is recommended to finalize permissions. Reboot now? (y/n) " yn
