@@ -58,7 +58,7 @@ def filter_targets(target_str):
 def get_latest_summary():
     files = [
         f for f in os.listdir(SUMMARY_DIR) 
-        if f.startswith("summary-") and f.endswith(".txt")
+        if f.startswith("summary_") and f.endswith(".txt")
     ]
     if len(files) <= 1:
         print("[LOG] No previous summary found")
@@ -116,12 +116,23 @@ def main():
 
     results, raw_nmap_text = run_scan(target, nmap_flags)
 
+    data_filename = f"scan_{timestamp}.txt"
+    data_path = os.path.join(DATA_DIR, data_filename)
+    
+    try:
+        with open(data_path, "w") as f:
+            f.write(raw_nmap_text)
+        print(f"[SUCCESS] Saved raw data to: {data_path}")
+    except Exception as e:
+        print(f"[ERROR] Could not save data file: {e}")
+
+
     # 4. REPORTING (SUMMARY & DIFF)
     summary_text = generate_summary(results, timestamp)
 
     # Check for Diff
     prev_file = get_latest_summary()
-    summary_path = f"{SUMMARY_DIR}/summary-{timestamp}.txt"
+    summary_path = f"/summary/summary_{timestamp}.txt"
     
     # Save current summary
     with open(summary_path, "w") as f:
