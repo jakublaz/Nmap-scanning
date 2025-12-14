@@ -11,7 +11,12 @@ RUN apk add --no-cache \
     ca-certificates \
     openssh-client \
     sshpass \
-    iproute2
+    iproute2 \
+    tzdata
+
+# 2. Configure Time Zone
+ENV TZ=Europe/Warsaw
+RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install python-nmap
 RUN pip3 install --break-system-packages python-nmap requests

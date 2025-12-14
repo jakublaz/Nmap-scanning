@@ -41,7 +41,7 @@
     # Try to stop, but ignore error if it's already stopped
     :do {
         /container stop [find name=$containerName]
-        :delay 5s
+        :delay 15s
     } on-error={
         :log info "Container was already stopped (or could not be stopped). Proceeding..."
     }
@@ -50,8 +50,12 @@
     /container remove [find name=$containerName]
 }
 
+# 2. Create a root directory
+:if ([:len [/file find name=$containerName]] = 0) do={
+    /file add name=$containerName type="directory"
+}
 
-# 2. Create new container
+# 3. Create new container
 :log info "Creating new container with CMD: $cmdString"
 /container add \
     file=$fileName \
