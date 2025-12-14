@@ -32,7 +32,9 @@ it works now for :
 - router-arp alone for now tested
 
 
-
-
 NEED TO CREATE A PASSWORD CONST FOR SMTP
 NEED TO ADD DATA VOLUME FOR CONTAINER STORAGE TO GET DIFF
+/tool ip-scan interface=ether1 address-range=192.168.0.0/24 duration=15s
+
+address range to jest subnet
+OSTATNI MAIL - zmienić jak pokauzje slanowanie port i service gdy nie znajdzie
