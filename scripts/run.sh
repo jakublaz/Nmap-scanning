@@ -127,7 +127,7 @@ echo "Starting container: $CONTAINER_NAME"
 echo "Command: $IMAGE_NAME $FINAL_ARGS"
 echo "------------------------------------------------"
 
-# Pass FINAL_ARGS to the container
+cd scripts
 docker run --rm -it --net=host --env-file .env "$IMAGE_NAME" $FINAL_ARGS
 
 echo "Execution finished."
