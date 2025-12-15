@@ -50,12 +50,7 @@
     /container remove [find name=$containerName]
 }
 
-# 2. Create a root directory
-:if ([:len [/file find name=$containerName]] = 0) do={
-    /file add name=$containerName type="directory"
-}
-
-# 3. Create new container
+# 2. Create new container
 :log info "Creating new container with CMD: $cmdString"
 /container add \
     file=$fileName \

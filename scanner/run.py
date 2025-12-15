@@ -55,19 +55,22 @@ def filter_targets(target_str):
 
     return " ".join(clean_list)
 
-def get_latest_summary():
+def get_latest_summary(preset):
+
+    prefix = f"summary_{preset}_"
+
     files = [
         f for f in os.listdir(SUMMARY_DIR) 
-        if f.startswith("summary_") and f.endswith(".txt")
+        if f.startswith(prefix) and f.endswith(".txt")
     ]
     if len(files) <= 1:
-        print("[LOG] No previous summary found")
+        print(f"[LOG] No previous summary found for {preset}")
         return None
 
     # sort by timestamp extracted from filename
     files.sort(reverse=True)  # newest first if ISO-like timestamp
     latest_file = files[1]
-    print(f"[LOG] Latest previous summary: {latest_file}")
+    print(f"[LOG] Latest previous {preset} summary: {latest_file}")
     return os.path.join(SUMMARY_DIR, latest_file)
 
 def perform_ping_sweep(network_cidr):
@@ -131,8 +134,8 @@ def main():
     summary_text = generate_summary(results, timestamp)
 
     # Check for Diff
-    prev_file = get_latest_summary()
-    summary_path = f"/summary/summary_{timestamp}.txt"
+    prev_file = get_latest_summary(args.preset)
+    summary_path = f"/summary/summary_{args.preset}_{timestamp}.txt"
     
     # Save current summary
     with open(summary_path, "w") as f:
