@@ -15,6 +15,12 @@ from logic import resolve_target, resolve_flags
 
 SUMMARY_DIR = "/summary"
 DATA_DIR = "/data"
+# --- HELPER: Sanitize Target for Filename ---
+def sanitize_target(target_str):
+    # Turns "192.168.0.0/24" into "192-168-0-0-24"
+    # Turns "192.168.0.1 192.168.0.2" into "192-168-0-1_192-168-0-2"
+    clean = target_str.replace("/", "-").replace(" ", "+")
+    return clean
 
 # --- HELPER: Find my own IP ---
 def get_container_ip():
@@ -55,22 +61,22 @@ def filter_targets(target_str):
 
     return " ".join(clean_list)
 
-def get_latest_summary(preset):
+def get_latest_summary(preset, target):
 
-    prefix = f"summary_{preset}_"
+    prefix = f"summary_{preset}_{target}"
 
     files = [
         f for f in os.listdir(SUMMARY_DIR) 
         if f.startswith(prefix) and f.endswith(".txt")
     ]
-    if len(files) <= 1:
-        print(f"[LOG] No previous summary found for {preset}")
+    if not files:
+        print(f"[LOG] No previous summary found for {target} ({preset})")
         return None
 
     # sort by timestamp extracted from filename
-    files.sort(reverse=True)  # newest first if ISO-like timestamp
-    latest_file = files[1]
-    print(f"[LOG] Latest previous {preset} summary: {latest_file}")
+    files.sort(reverse=True)
+    latest_file = files[0]
+    print(f"[LOG] Latest previous {target} ({preset}) summary: {latest_file}")
     return os.path.join(SUMMARY_DIR, latest_file)
 
 def perform_ping_sweep(network_cidr):
@@ -129,13 +135,34 @@ def main():
     except Exception as e:
         print(f"[ERROR] Could not save data file: {e}")
 
+# Check for flag
+    flag_file = "/data/scheduled.flag.txt"
+    run_origin = "[MANUAL]"
+
+    try:
+        print(f"[DEBUG] Files in /data: {os.listdir('/data')}")
+    except Exception as e:
+        print(f"[WARN] Could not list /data: {e}")
+
+    if os.path.exists(flag_file):
+        run_origin = "[SCHEDULED]"
+        try:
+            os.remove(flag_file) # Delete it so next manual run doesn't get confused
+            print(f"[LOGIC] Found scheduler flag ({flag_file}). Set mode to SCHEDULED.")
+        except OSError as e:
+            print(f"[WARN] Could not delete scheduler flag: {e}")
+    else:
+        print(f"[LOGIC] Flag file ({flag_file}) not found. Running in MANUAL mode.")
+
 
     # 4. REPORTING (SUMMARY & DIFF)
     summary_text = generate_summary(results, timestamp)
 
+    safe_target = sanitize_target(target)
+
     # Check for Diff
-    prev_file = get_latest_summary(args.preset)
-    summary_path = f"/summary/summary_{args.preset}_{timestamp}.txt"
+    prev_file = get_latest_summary(args.preset, safe_target)
+    summary_path = f"/summary/summary_{args.preset}_{safe_target}_{timestamp}.txt"
     
     # Save current summary
     with open(summary_path, "w") as f:
@@ -158,7 +185,7 @@ def main():
     send_email(
         sender="Container_test@op.pl",
         recipient="user_test125@wp.pl",
-        subject=f"Nmap Scan: {args.mode.upper()} - {timestamp}",
+        subject=f"{run_origin} Nmap Scan: {args.mode.upper()} - {timestamp}",
         body=summary_text,
         attachment_path=tmp_path
     )
