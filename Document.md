@@ -39,10 +39,9 @@ NEED TO ADD DATA VOLUME FOR CONTAINER STORAGE TO GET DIFF
 
 OSTATNI MAIL - zmienić jak pokauzje slanowanie port i service gdy nie znajdzie
 
-ZMIANA TEMP FILE NA TEN ZAPISANY jako dorzucany do maila
-
 OCZYSZCZANIE STARYCH PLIKÓW - dodać opcję clean, będzie chodziła co jakiś czas
 
+przeczytanie co oznaczają porty (reset)
 
 #### LATER:
 - przygotowanie x containerów i uzywanie wolnego, albo trzworzenie nowego gdy wszystie stworzone są zajęte a potrzebna nowego
