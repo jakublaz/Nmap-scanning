@@ -139,11 +139,6 @@ def main():
     flag_file = "/data/scheduled.flag.txt"
     run_origin = "[MANUAL]"
 
-    try:
-        print(f"[DEBUG] Files in /data: {os.listdir('/data')}")
-    except Exception as e:
-        print(f"[WARN] Could not list /data: {e}")
-
     if os.path.exists(flag_file):
         run_origin = "[SCHEDULED]"
         try:
@@ -176,10 +171,10 @@ def main():
             f.write("\n" + diff)
 
     # 5. EMAIL
-    # Create temp file for raw attachment
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as tmp:
-        tmp.write(raw_nmap_text.encode("utf-8"))
-        tmp_path = tmp.name
+    final_attachment_path = data_path if os.path.exists(data_path) else None
+    
+    if not final_attachment_path:
+        print(f"[WARN] File {data_path} not found. Sending email without attachment.")
 
     print("[EXEC] Sending email...")
     send_email(
@@ -187,7 +182,7 @@ def main():
         recipient="user_test125@wp.pl",
         subject=f"{run_origin} Nmap Scan: {args.mode.upper()} - {timestamp}",
         body=summary_text,
-        attachment_path=tmp_path
+        attachment_path=final_attachment_path
     )
 
     print("[DONE] Scan finished successfully.")
