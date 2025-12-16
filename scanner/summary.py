@@ -1,4 +1,5 @@
 import datetime
+import ipaddress
 
 def generate_summary(scan_results, timestamp):
     lines = []
@@ -6,41 +7,48 @@ def generate_summary(scan_results, timestamp):
     lines.append("FINAL SUMMARY")
     lines.append("==================================================")
 
-    for host in sorted(scan_results.keys(), key=lambda ip: tuple(int(x) for x in ip.split('.'))):
+    # --- HELPER: Safe Sorting for IPs and Hostnames ---
+    def sort_key(target):
+        try:
+            # Handle IPv4 and IPv6
+            return (0, ipaddress.ip_address(target))
+        except ValueError:
+            # Handle Hostnames (sort them after IPs alphabetically)
+            return (1, target)
+
+    # Sort hosts safely
+    sorted_hosts = sorted(scan_results.keys(), key=sort_key)
+
+    for host in sorted_hosts:
         data = scan_results[host]
+        state = data.get('state', 'unknown')
+        
         lines.append(f"Host: {host}")
-        lines.append(f"  - State: {data.get('state', 'unknown')}")
+        lines.append(f"  - State: {state}")
 
         # ------------------------------
-        # PORTS + SERVICES
+        # PORTS + SERVICES (Combined)
         # ------------------------------
         protocols = data.get("protocols", {})
-
-        open_ports = []
-        services = []
+        open_ports_list = []
 
         for proto, ports in protocols.items():
             for port, info in ports.items():
                 if info.get("state") == "open":
-                    open_ports.append(f"{port}/{proto}")
                     svc = info.get("service") or "unknown"
-                    services.append(svc)
+                    # Format: "80/tcp (http)"
+                    open_ports_list.append(f"{port}/{proto} ({svc})")
 
-        if open_ports:
-            lines.append(f"  - Open ports: {', '.join(open_ports)}")
+        # --- LOGIC FIX: Distinguish between "Clean Scan" and "No Scan" ---
+        if open_ports_list:
+            lines.append(f"  - Open ports: {', '.join(open_ports_list)}")
         else:
-            if protocols:
-                lines.append("  - Open ports: none")
+            if state == 'up':
+                # Host is UP, but no ports were returned -> Firewall/Closed
+                lines.append("  - Result: 0 open ports found (all scanned ports closed/filtered)")
             else:
-                lines.append("  - No port scan performed")
-
-        if services:
-            lines.append(f"  - Services: {', '.join(services)}")
-        else:
-            if protocols:
-                lines.append("  - Services: none")
-            else:
-                lines.append("  - Services: N/A (no version scan)")
+                # Host is DOWN or actually not scanned
+                lines.append("  - Result: Host appears offline or blocking ping")
 
         # ------------------------------
         # HOST-SCRIPT RESULTS (NSE)
@@ -49,7 +57,9 @@ def generate_summary(scan_results, timestamp):
         if host_scripts:
             lines.append("  - Host scripts:")
             for script_name, output in host_scripts.items():
-                lines.append(f"      * {script_name}: {output.splitlines()[0]}...")
+                # Clean up output: take first line, max 60 chars
+                clean_out = output.splitlines()[0][:60]
+                lines.append(f"      * {script_name}: {clean_out}...")
 
         # ------------------------------
         # PORT-SCRIPT RESULTS (NSE)
@@ -57,10 +67,11 @@ def generate_summary(scan_results, timestamp):
         port_scripts = data.get("port_scripts")
         if port_scripts:
             lines.append("  - Port scripts:")
-            for key, scripts in port_scripts.items():
-                lines.append(f"      * Port {key}:")
+            for port_key, scripts in port_scripts.items():
+                lines.append(f"      * Port {port_key}:")
                 for sname, stext in scripts.items():
-                    lines.append(f"          - {sname}: {stext.splitlines()[0]}...")
+                    clean_out = stext.splitlines()[0][:60]
+                    lines.append(f"          - {sname}: {clean_out}...")
 
         # ------------------------------
         # OS DETECTION
@@ -68,26 +79,18 @@ def generate_summary(scan_results, timestamp):
         os_info = data.get("osmatch")
         if os_info:
             lines.append("  - OS Detection:")
-            for match in os_info:
+            # Limit to top 3 matches to save space
+            for match in os_info[:3]:
                 name = match.get("name")
                 acc = match.get("accuracy")
                 lines.append(f"      * {name} ({acc}% confidence)")
-        
-                classes = match.get("osclass", [])
-                for cls in classes:
-                    vendor = cls.get("vendor")
-                    family = cls.get("osfamily")
-                    gen = cls.get("osgen")
-                    lines.append(f"          - {vendor} {family} {gen} ({cls.get('accuracy')}%)")
 
-
-        lines.append("")
+        lines.append("") # Empty line for spacing
 
     lines.append("==================================================")
     lines.append("ALL SCANS COMPLETED")
-    lines.append(f"Finished: {datetime.datetime.utcnow()}")
+    # Updated to use modern timezone-aware UTC
+    lines.append(f"Finished: {datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}")
     lines.append("==================================================")
 
     return "\n".join(lines)
-
-
