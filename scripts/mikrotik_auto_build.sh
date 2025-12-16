@@ -6,7 +6,7 @@
 :local fileName "nmap-python.tar"
 :local interfaceName "veth1"
 :local envListName "scan_vars"
-:local mountListName "Nmap-python"
+:local mountListName "Data, Summary"
 :local rootDirName "Nmap-python"
 :local cmdString
 
@@ -18,8 +18,8 @@
 
 # 2. Add the required variables fresh
 /container envs add list=$envListName key="ROUTER_IP" value="192.168.0.3"
-/container envs add list=$envListName key="ROUTER_USER" value="user"
-/container envs add list=$envListName key="ROUTER_PASS" value="password"
+/container envs add list=$envListName key="ROUTER_USER" value="scanner"
+/container envs add list=$envListName key="ROUTER_PASS" value="*JJ1iLT2p16W"
 /container envs add list=$envListName key="AUTO" value="192.168.0.0/24"
 
 # Logic: Check if global input exists. If yes, use it. If no, use default.
@@ -33,8 +33,7 @@
 }
 
 :log info "--- Starting Nmap Container Update ---"
-
-# 1. Stop old container safely
+# 1. STOP & REMOVE OLD CONTAINER
 :if ([:len [/container find name=$containerName]] > 0) do={
     :log info "Found old container. Checking status..."
     
@@ -50,7 +49,12 @@
     /container remove [find name=$containerName]
 }
 
-# 2. Create new container
+
+# 3. CREATE ROOT DIRECTORY
+:delay 5s
+
+
+# 3. Create new container
 :log info "Creating new container with CMD: $cmdString"
 /container add \
     file=$fileName \

@@ -10,7 +10,6 @@ def generate_summary(scan_results, timestamp):
     # --- HELPER: Safe Sorting for IPs and Hostnames ---
     def sort_key(target):
         try:
-            # Handle IPv4 and IPv6
             return (0, ipaddress.ip_address(target))
         except ValueError:
             # Handle Hostnames (sort them after IPs alphabetically)
@@ -39,7 +38,7 @@ def generate_summary(scan_results, timestamp):
                     # Format: "80/tcp (http)"
                     open_ports_list.append(f"{port}/{proto} ({svc})")
 
-        # --- LOGIC FIX: Distinguish between "Clean Scan" and "No Scan" ---
+        # Distinguish between "Clean Scan" and "No Scan" ---
         if open_ports_list:
             lines.append(f"  - Open ports: {', '.join(open_ports_list)}")
         else:

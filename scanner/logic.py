@@ -78,7 +78,6 @@ def resolve_target(args):
 
     return target
 
-# logic.py
 
 def resolve_flags(args):
     """

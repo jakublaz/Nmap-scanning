@@ -1,7 +1,6 @@
 import os
 import sys
 from datetime import datetime, timezone
-import tempfile
 import time
 import nmap
 import socket
