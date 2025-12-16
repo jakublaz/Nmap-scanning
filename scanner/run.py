@@ -12,6 +12,7 @@ from diff import generate_diff
 from emailer import send_email
 from cli import get_args
 from logic import resolve_target, resolve_flags
+from cleaner import run_cleanup
 
 SUMMARY_DIR = "/summary"
 DATA_DIR = "/data"
@@ -96,6 +97,11 @@ def perform_ping_sweep(network_cidr):
 def main():
     # 1. GET ARGUMENTS (CLI)
     args = get_args()
+
+    # Clean
+    if args.mode == "clean":
+        run_cleanup()
+        return
 
     # DEBUG
     if args.mode == "debug":

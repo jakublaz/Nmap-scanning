@@ -34,6 +34,8 @@ def get_args():
     p_arp = subparsers.add_parser("router-arp", parents=[base_parser], help="Scan Router ARP Table")
     p_arp.add_argument('manual_flags', nargs=argparse.REMAINDER, help="Manual Nmap flags override")
 
+    # Mode: Clean
+    p_clean = subparsers.add_parser("clean", help="Keep only the latest file for each scan type")
     # Mode: DEBUG
     p_debug = subparsers.add_parser("debug", parents=[base_parser], help="Do nothing: keep container alive for debugging")
 

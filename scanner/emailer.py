@@ -42,7 +42,3 @@ def send_email(sender, recipient, subject, body, attachment_path=None):
     # Send
     p = subprocess.Popen(["msmtp", recipient], stdin=subprocess.PIPE)
     p.communicate("\n".join(msg).encode("utf-8"))
-
-    # Delete temp file if needed
-    if attachment_path and os.path.exists(attachment_path):
-        os.remove(attachment_path)
