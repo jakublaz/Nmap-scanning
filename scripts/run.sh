@@ -39,10 +39,10 @@ else
         echo ""
         echo "------------------------------------------------"
         echo "STEP 2: Select Scan Intensity (Preset)"
-        echo "  1) normal      (Default: -sV)"
+        echo "  1) normal      (-sV --version-intensity 5 -T4)"
         echo "  2) fast        (-T4 -F)"
-        echo "  3) deep        (-A -p-)"
-        echo "  4) vuln        (--script vuln)"
+        echo "  3) deep        (-sS -sV -p- -T4 --min-rate 500 --max-retries 2)"
+        echo "  4) vuln        (-sV --script vuln --script-timeout 2m -T3)"
         echo "------------------------------------------------"
         read -p "Enter preset [default: normal]: " PRESET_INPUT
 
